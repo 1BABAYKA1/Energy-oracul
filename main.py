@@ -1,4 +1,10 @@
-import pandas
+# Importing pandas to open the csv file
+import pandas as pd
 
-file = pandas.read_csv("data.csv", delimiter=',', index_col=0)
-print(file)
+
+def read_data():
+    data = pd.read_csv('data.csv')
+    data = data.dropna()
+    data = data.reset_index(drop=True)
+    data = data.drop(['predict', 'temp_pred', 'weather_pred'], axis=1)
+    return data
