@@ -1,4 +1,4 @@
-date,time,target,temp,weather_fact
+date,time,target,temp,weather_code
 2019-01-01,0,481.51,2.9,ветер
 2019-01-01,1,462.872,2.9,ветер
 2019-01-01,2,449.718,2.9,ветер

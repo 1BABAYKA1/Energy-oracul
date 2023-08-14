@@ -10,8 +10,8 @@ class CSVColumnRemover:
         data = data.drop(columns=columns_to_remove)
         data.to_csv(self.output_file, index=False)
 
-input_file = 'data_edit/data.csv'
-output_file = 'data_now.csv'
+input_file = 'files/data.csv'
+output_file = 'files/data_now.csv'
 columns_to_remove = ['predict', 'temp_pred', 'weather_pred']
 
 csv_remover = CSVColumnRemover(input_file, output_file)

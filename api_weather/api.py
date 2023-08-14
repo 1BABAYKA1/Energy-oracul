@@ -1,5 +1,10 @@
 import requests
-from key import API_KEY
+import os
+from dotenv import load_dotenv
+import csv
+
+load_dotenv()
+
 class WeatherForecast:
     def __init__(self, api_key):
         self.api_key = api_key
@@ -22,15 +27,21 @@ class WeatherForecast:
             for day in forecast
             for hour in day['hour']
         ]
-        
-API_KEY = '4a29ee892ea14dd3869142054231308'
-city = "Москва"
 
-weather_obj = WeatherForecast(API_KEY)
-weather_forecast = weather_obj.get_forecast(city)
+    def write_to_csv(self, forecast):
+        csv_filename = "files/weather_forecast.csv"
+        with open(csv_filename, mode='w', newline='', encoding='utf-8') as csv_file:
+            fieldnames = ['Date', 'Time', 'Temperature (°C)', 'Condition', 'Condition Code']
+            writer = csv.writer(csv_file)
+            writer.writerow(fieldnames)
+            for data in forecast:
+                writer.writerow(data)
 
-for i in range(0, len(weather_forecast), 10):
-    for j in range(10):
-        index = i + j
-        if index < len(weather_forecast):
-            print(weather_forecast[index])
+        print(f"Прогноз погоды записан в файл: {csv_filename}")
+
+if __name__ == "__main__":
+    api_key = os.getenv("API_KEY")
+    city = "Москва"
+    weather_obj = WeatherForecast(api_key)
+    weather_forecast = weather_obj.get_forecast(city)
+    weather_obj.write_to_csv(weather_forecast)
