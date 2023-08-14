@@ -1,5 +1,5 @@
 import requests
-
+from key import API_KEY
 class WeatherForecast:
     def __init__(self, api_key):
         self.api_key = api_key
@@ -22,7 +22,7 @@ class WeatherForecast:
             for day in forecast
             for hour in day['hour']
         ]
-
+        
 API_KEY = '4a29ee892ea14dd3869142054231308'
 city = "Москва"
 
