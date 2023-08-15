@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def read_data():
-    data = pd.read_csv('data.csv')
+    data = pd.read_csv('random_forest/data.csv')
     data = data.dropna()
     data = data.reset_index(drop=True)
     data = data.drop(['predict', 'temp_pred', 'weather_pred'], axis=1)
