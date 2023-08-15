@@ -29,11 +29,16 @@ class RandomForestPredictor:
         return y_pred[0]
 
 if __name__ == "__main__":
+    def make_predictions(predictor, hours):
+        input_data = np.array(predictor.x.iloc[-2, :]).reshape(1, -1)
+        input_data[0, 0] = hours
+        prediction = predictor.predict(input_data)
+        return prediction
+
     predictor = RandomForestPredictor('random_forest/data.csv')
     predictor.load_data()
     predictor.train()
     
-    input_data = np.array(predictor.x.iloc[-2, :]).reshape(1, -1)
-    prediction = predictor.predict(input_data)
-    
-    print("Прогноз на следующий день:", prediction)
+    for hours in [1, 3, 6]:
+        prediction = make_predictions(predictor, hours)
+        print(f"Прогноз на {hours} часа(ов):", prediction)
