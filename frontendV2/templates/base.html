@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="/static/css/style.css">
+	<script src="/static/app.js" defer></script>
+	<script src="/static/rain.js" defer></script>
+    <title>{{ title }}</title>
+</head>
+<body>
+	<header>
+		<nav>
+			<ul>
+				<li><a href="/">Главная</a></li>
+				<li><a href="/about">О проекте</a></li>
+				<li><a href="/contact">Контакты</a></li>
+				<li><a href="/login">Вход</a></li>
+				<li class="user-nickname"></li>
+			</ul>
+		</nav>
+	</header>   
+<body>
+<main role="main" class="container">
+    {% block content %}{% endblock %}
+</main>
+</body>
+</html>
+</html>

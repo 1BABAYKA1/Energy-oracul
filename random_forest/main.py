@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestRegressor
 import warnings
 
 class RandomForestPredictor:
-    def __init__(self, data_path, n_estimators=100, random_state=0):
+    def __init__(self, data_path, n_estimators=1000, random_state=0):
         self.data_path = data_path
         self.n_estimators = n_estimators
         self.random_state = random_state
