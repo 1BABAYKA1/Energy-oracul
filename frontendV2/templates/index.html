@@ -8,18 +8,16 @@
 				<div class="hero-content">
 					<h1>Energy Oracle <span>Россети</span></h1>
 					<div class="hero-content__p">Forecast of electric energy consumption</div>
-					<button class="button-start" ><a class='text' href="/login">Начать использовать</button>
+					<button class="button-start">
+						{% if not user %}
+							<a class='text' href="/login">Начать использовать </a>
+						{% endif %}
+					</button>
 				</div>
 			</div>
 			<div class="layers__item layer-4">
 				<canvas class="rain"></canvas>
 			</div>
 		</div>
-	</section>
-	<section id="about" class="about-section">
-
-	</section>
-	<section id="contact" class="contact-section">
-		
 	</section>
 {% endblock %}

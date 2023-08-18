@@ -4,14 +4,21 @@ from flask_login import login_required, LoginManager, logout_user
 from data.users import User
 from config import DEBUG, TEMPLATES_AUTO_RELOAD
 from flask import Flask, render_template, redirect, session
+from flask import Flask, render_template, redirect, request, session, url_for
+from flask_session import Session
+from datetime import datetime, timedelta
+from flask import Flask, render_template, redirect, session, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+
 
 app = Flask(__name__)
 app.config["DEBUG"] = DEBUG
 app.config["DEBUG"] = TEMPLATES_AUTO_RELOAD
 
+app.config["SESSION_TYPE"] = "filesystem"
+Session(app)
 login = LoginManager(app)
 app.config["SECRET_KEY"] = 'Energy_Oracul'
-
 
 @login.user_loader
 def load_user(user_id):
@@ -21,15 +28,21 @@ def load_user(user_id):
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template("index.html", title='Главная')
+    if 'user_id' in session:
+        user_id = session.get('user_id')
+        if user_id:
+            db_sess = db_session.create_session()
+            user = db_sess.query(User).get(user_id)
+            return render_template("menu.html", user=user.name, title='Главная')
+    else: 
+        return render_template("index.html", title='Главная')
 
 
 @app.route('/logout')
-@login_required
 def logout():
-    logout_user()
-    return redirect("/")
-
+    session.pop('user_id', None)
+    session.pop('expiry', None)
+    return redirect('/login')
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -57,13 +70,17 @@ def reqister():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if 'user_id' in session:
+        return redirect('/menu')
+    
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             session['user_id'] = user.id
-            return redirect("/menu")
+            session['expiry'] = datetime.now() + timedelta(minutes=15)
+            return redirect("/")
         return render_template('login.html', message="Неправильный логин или пароль", form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
@@ -74,14 +91,9 @@ def menu():
         db_sess = db_session.create_session()
         user = db_sess.query(User).get(user_id)
         if user:
-            return render_template('menu.html', user=user.name, title='Меню')
-    
+            session['expiry'] = datetime.now() + timedelta(minutes=15)
+            return render_template('base.html', user=user.name, title='Меню')
     return redirect('/login')
-
-
-@app.route('/about')
-def about():
-    return render_template('about.html', title='О проекте')
 
 
 def main():
