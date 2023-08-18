@@ -182,30 +182,30 @@ header {
 	padding: 5px;
 	display: flex;
 	align-items: center;
-  }
-  
-  .button-menu span {
+}
+
+.button-menu span {
 	display: block;
 	width: 25px;
 	height: 2px;
 	background-color: #fff;
 	margin: 4px 0;
 	transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
-  }
-  
-  .button-menu.open span:nth-child(1) {
-	transform: translateY(6px) rotate(45deg);
-  }
-  
-  .button-menu.open span:nth-child(2) {
-	opacity: 0;
-  }
-  
-  .button-menu.open span:nth-child(3) {
-	transform: translateY(-6px) rotate(-45deg);
-  }
+}
 
-  .registration-form {
+.button-menu.open span:nth-child(1) {
+	transform: translateY(6px) rotate(45deg);
+}
+
+.button-menu.open span:nth-child(2) {
+	opacity: 0;
+}
+
+.button-menu.open span:nth-child(3) {
+	transform: translateY(-6px) rotate(-45deg);
+}
+
+.registration-form {
     max-width: 500px;
     min-width: 500px;
     margin: 0 auto;
@@ -244,4 +244,19 @@ header {
     color: #fff;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+a.text:active,
+a.text:hover,
+a.text {
+	text-decoration: none;
+	color: #ffffff;
+}
+
+.layers__container_not_preserve {
+	height: 100vh;
+	min-height: 500px;
+	transform-style: preserve-3d;
+	transform: rotateX(var(--move-y)) rotateY(var(--move-x));
+	will-change: transform;
+	transition: transform var(--transition);
 }

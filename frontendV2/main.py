@@ -1,9 +1,9 @@
-from flask import Flask, render_template, redirect, url_for
 from data import db_session
 from forms.user import RegistrationForm, LoginForm
-from flask_login import login_required, LoginManager, login_user, logout_user
+from flask_login import login_required, LoginManager, logout_user
 from data.users import User
 from config import DEBUG, TEMPLATES_AUTO_RELOAD
+from flask import Flask, render_template, redirect, session
 
 app = Flask(__name__)
 app.config["DEBUG"] = DEBUG
@@ -62,13 +62,27 @@ def login():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
-            return redirect("/get_bot")
+            session['user_id'] = user.id
+            return redirect("/menu")
         return render_template('login.html', message="Неправильный логин или пароль", form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 @app.route('/menu')
 def menu():
-    return render_template('bot.html')
+    user_id = session.get('user_id')
+    if user_id:
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).get(user_id)
+        if user:
+            return render_template('menu.html', user=user.name, title='Меню')
+    
+    return redirect('/login')
+
+
+@app.route('/about')
+def about():
+    return render_template('about.html', title='О проекте')
+
 
 def main():
     db_session.global_init("db/users.db")
