@@ -23,3 +23,7 @@ class User(SqlAlchemyBase, UserMixin):
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)
+    
+    def change_password(self, new_password):
+        self.set_password(new_password)
+        db.session.commit()

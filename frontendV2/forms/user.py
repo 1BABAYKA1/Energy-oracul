@@ -13,3 +13,14 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Пароль', validators=[DataRequired()])
     password_confirm = PasswordField('Подтверждение пароля', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Зарегистрироваться')
+
+
+class ChangeForm(FlaskForm):
+    email = StringField('Почта', validators=[DataRequired()])
+    submit = SubmitField('Отправить письмо о смене пароля')
+
+
+class ChangePasswordForm(FlaskForm):
+    password = PasswordField('Пароль', validators=[DataRequired()])
+    password_confirm = PasswordField('Подтверждение пароля', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Сменить пароль')
