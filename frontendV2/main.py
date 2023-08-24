@@ -4,14 +4,15 @@ from flask_login import LoginManager
 from data.users import User
 from config import DEBUG, TEMPLATES_AUTO_RELOAD
 from flask import Flask, render_template, request, redirect, url_for, flash
-import random
-import string
 from flask_mail import Mail, Message
 from flask_session import Session
 from datetime import datetime, timedelta
 from flask import Flask, render_template, redirect, session
 from flask_login import LoginManager
 import secrets
+from flask import Flask, render_template, request
+from werkzeug.utils import secure_filename
+
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = 'LOLLLL'
@@ -20,7 +21,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = TEMPLATES_AUTO_RELOAD
 
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
+app.config["UPLOAD_FOLDER"] = "static/update/"
 login = LoginManager(app)
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -29,6 +30,7 @@ app.config['MAIL_USERNAME'] = 'flasktest979@gmail.com'
 app.config['MAIL_PASSWORD'] = 'bazrnyzucipnnzqg'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
+
 mail = Mail(app)
 password_reset_tokens = {}
 
@@ -37,7 +39,7 @@ def generate_token():
 
 def send_email(email, text, zaglav):
     msg = Message(zaglav, sender='flasktest979@gmail.com', recipients=[email])
-    msg.body = f'{text}'
+    msg.html = f'{text}'
     mail.send(msg)
     
 @login.user_loader
@@ -66,14 +68,25 @@ def logout():
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
+    if 'user_id' in session:
+        return redirect('/')
     form = RegistrationForm()
     if form.validate_on_submit():
-        if form.password.data != form.password_confirm.data:
+        db_sess = db_session.create_session()
+        if form.name.data == '':
+            return render_template('register.html', title='Регистрация',
+                                    form=form,
+                                    message="Имя пользователя не может быть пустым")
+        elif form.password.data != form.password_confirm.data:
             return render_template('register.html', title='Регистрация',
                                     form=form,
                                     message="Пароли не совпадают")
-        db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
+        elif len(form.password.data) < 8:
+            return render_template('register.html', title='Регистрация',
+                                    form=form,
+                                    message="Пароли меньше 8 символов!")    
+
+        elif db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('register.html', title='Регистрация',
                                     form=form,
                                     message="Такой пользователь уже есть")
@@ -101,7 +114,7 @@ def check_email_work():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if 'user_id' in session:
-        return redirect('/menu')
+        return redirect('/')
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -111,7 +124,7 @@ def login():
             session['user_id'] = user.id
             session['expiry'] = datetime.now() + timedelta(minutes=15)
             send_email(email=form.email.data, text=f"Дорогой друг, {user.name}!\n Кто-то вошёл в Ваш аккаунт! Если это не Вы, то срочно смените пароль!", zaglav='Уведомление безопасности')
-            return redirect("/")
+            return redirect("/menu")
         send_email(email=form.email.data, text=f"Дорогой друг, {user.name}!\n Кто-то пытался войти в аккаунт использовая неверный пароль.", zaglav='Уведомление безопасности')
         return render_template('login.html', message="Неправильный логин или пароль", form=form)
     return render_template('login.html', title='Авторизация', form=form)
@@ -124,27 +137,37 @@ def menu():
         user = db_sess.query(User).get(user_id)
         if user:
             session['expiry'] = datetime.now() + timedelta(minutes=15)
-            return render_template('base.html', user=user.name, title='Меню')
+            redirect('/')
     return redirect('/login')
 
 @app.route('/change', methods=['GET', 'POST'])
 def change():
+    if 'user_id' in session:
+        return redirect('/')
     form = ChangeForm()
     if form.validate_on_submit():
-        token = generate_token()
-        email = form.email.data
-        password_reset_tokens[email] = token
-        print(password_reset_tokens)
-        send_email(
-            email=email,
-            text=f"Вы запросили смену пароля. Перейдите по ссылке, чтобы изменить пароль: {url_for('change_password', token=token)}",
-            zaglav='Уведомление безопасности'
-        )
-        return redirect('/')
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
+        if not user:
+            return render_template('change.html', title='Смена пароля',
+                                    form=form,
+                                    message="Пользователь не найден")
+        else:
+            token = generate_token()
+            email = form.email.data
+            password_reset_tokens[email] = token
+            send_email(
+                email=email,
+                text=f"{render_template('email/reset_password.html', user=User.name, token=token)}",
+                zaglav='Уведомление безопасности'
+            )
+            return redirect('/')
     return render_template('change.html', title='Забыл пароль', form=form)
 
 @app.route('/change_password?token=<token>', methods=['GET', 'POST'])
 def change_password(token):
+    if 'user_id' in session:
+        return redirect('/')
     email = next((email for email, t in password_reset_tokens.items() if t == token), None)
     print(email)
     print(password_reset_tokens)
@@ -156,11 +179,24 @@ def change_password(token):
             if user:
                 user.set_password(form.password.data)
                 db_sess.commit()
-                del password_reset_tokens[email]  # Удаляем использованный токен
+                del password_reset_tokens[email]
                 return redirect('/')
         return render_template('changepassword.html', title='Смена пароля', form=form)
     return redirect('/')
 
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    if request.method == 'POST':
+
+        f = request.files['file']
+        filename = secure_filename(f.filename)
+
+        f.save(app.config['UPLOAD_FOLDER'] + filename)
+
+        file = open(app.config['UPLOAD_FOLDER'] + filename, "r")
+        content = file.read()
+
+        return content 
 
 def main():
     db_session.global_init("db/users.db")

@@ -255,8 +255,6 @@ a.text {
 .layers__container_not_preserve {
 	height: 100vh;
 	min-height: 500px;
-	transform-style: preserve-3d;
-	transform: rotateX(var(--move-y)) rotateY(var(--move-x));
 	will-change: transform;
 	transition: transform var(--transition);
 }
@@ -314,3 +312,34 @@ a.text {
 	font-weight: 900;
 }
 
+.dropdown {
+	margin-bottom: 10px;
+}
+
+label {
+	display: block;
+	font-weight: bold;
+	margin-bottom: 7px;
+}
+
+select {
+	width: 100%;
+	padding: 18px;
+	border: 3px solid #ccc;
+	border-radius: 7px;
+	background-color: #f7f7f7;
+}
+#upload-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#upload-button.uploaded {
+    background-color: #28a745;
+    cursor: default;
+}
