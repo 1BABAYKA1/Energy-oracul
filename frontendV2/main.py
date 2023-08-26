@@ -3,7 +3,7 @@ from forms.user import RegistrationForm, LoginForm, ChangeForm, ChangePasswordFo
 from flask_login import LoginManager
 from data.users import User
 from config import DEBUG, TEMPLATES_AUTO_RELOAD
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file
 from flask_mail import Mail, Message
 from flask_session import Session
 from datetime import datetime, timedelta
@@ -12,7 +12,15 @@ from flask_login import LoginManager
 import secrets
 from flask import Flask, render_template, request
 from werkzeug.utils import secure_filename
-
+import os
+from learn.obrabot_learn import start_obrabot_learn as learn
+from test_neural.obrabot_test import start_obrabot_test as test
+from create.main import add_file as ad
+from neural.RF_fit_back import learn as fit
+from neural.RF_back import predict
+from flask import Flask, request, jsonify, send_from_directory, make_response, send_file
+from werkzeug.utils import secure_filename
+import os
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = 'LOLLLL'
@@ -21,7 +29,8 @@ app.config["TEMPLATES_AUTO_RELOAD"] = TEMPLATES_AUTO_RELOAD
 
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-app.config["UPLOAD_FOLDER"] = "static/update/"
+app.config["UPLOAD_FOLDER"] = "files/update/"
+app.config["PREDICTION_FOLDER"] = "files/predict/"
 login = LoginManager(app)
 
 app.config['MAIL_SERVER']='smtp.gmail.com'
@@ -186,17 +195,43 @@ def change_password(token):
 
 @app.route('/upload', methods=['POST'])
 def upload_file():
+    response_data = {}
+    good = {"status_code": "success"}
+    error_code = {"status_code": "error"}
+    error_format = {"status_code": "format_error"}
     if request.method == 'POST':
-
+        
+        for key, value in request.args.items():
+            response_data[key] = value
+        print(response_data['hours'])
         f = request.files['file']
         filename = secure_filename(f.filename)
+        hours = response_data['hours']
+        longitude = response_data['longitude']
+        latitude = response_data['latitude']
+        f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        
+        file = open(os.path.join(app.config['UPLOAD_FOLDER'], filename), "r")
+        first_line = file.readline().strip()  
+        expected_header = "time;target;date"
 
-        f.save(app.config['UPLOAD_FOLDER'] + filename)
+        if first_line == expected_header:
+            ad(filename, hours)
+            learn(filename, latitude, longitude)
+            test(filename, latitude, longitude, hours)
+            # fit(filename)
+            return jsonify({'status_code': 'good', 'url': predict(filename, hours)})
+        else:
+            return jsonify(error_format)
+    else:
+        return jsonify(error_code)
+    
+@app.route('/download/files/predict/<filename>', methods=['GET'])
+def download_prediction(filename):
+    response = make_response(send_file(os.path.join(app.config['PREDICTION_FOLDER'], filename)))
+    response.headers['Content-Disposition'] = f'attachment; filename=Predict.xlsx'
+    return response
 
-        file = open(app.config['UPLOAD_FOLDER'] + filename, "r")
-        content = file.read()
-
-        return content 
 
 def main():
     db_session.global_init("db/users.db")

@@ -2,6 +2,8 @@ import pandas as pd
 from datetime import datetime
 import holidays
 from datetime import timedelta
+
+
 class WeekendAnalyzer:
     def __init__(self, input_csv, output_csv):
         self.input_csv = input_csv
@@ -37,12 +39,11 @@ class WeekendAnalyzer:
         output_df = pd.DataFrame({'prev_day': prev_day, 'prev_hour': prev_hour})
         self.data = pd.concat([self.data, output_df], axis=1)
         
-    def prev_day_hour_last(self, hours):
-        df = pd.read_csv('files/weather_forecast.csv', delimiter=';')
-
+    def prev_day_hour_last(self, hours, filename):
+        df = pd.read_csv(f'files/learn/l_{filename}', delimiter=';')
         target = df['target'].tolist()[-1]
-        prev_hour = [target] * hours
-        prev_day = [target] * hours
+        prev_hour = [target] * int(hours)
+        prev_day = [target] * int(hours)
         output_df = pd.DataFrame({'prev_day': prev_day, 'prev_hour': prev_hour})
         self.data = pd.concat([self.data, output_df], axis=1)
         
@@ -59,9 +60,9 @@ class WeekendAnalyzer:
         self.prev_day()
         self.save_output()
 
-    def analyze_pred(self, hours):
+    def analyze_pred(self, hours, filename):
         self.load_data()
         self.add_weekend_column()
-        self.prev_day_hour_last(hours)
+        self.prev_day_hour_last(hours, filename)
         self.save_output()
 

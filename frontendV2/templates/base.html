@@ -52,18 +52,7 @@
 	
     {% if request.path not in ['/login', '/register'] %}
 	<script src="/static/app.js" defer></script>
-	<section id="about" class="layers">
-		<div class="layers__container">
-			<div class="layers__item layer-1" style="background-image: url(static/back2.jpg);"></div>
-			<div class="layers__item layer-3">
-				<div class="hero-content">
-					<h1>Создали <span></span></h1>
-					<div class="hero-content__p">Победители олимпиады Россети</div>
-				</div>
-			</div>
-		</div>
-	</section>
-	<section id="contact" class="layers">
+    <section id="contact" class="layers">
 		<div class="layers__container">
 			<div class="layers__item layer-1" style="background-image: url(static/back2.jpg);"></div>
 			<div class="layers__item layer-3">
@@ -74,6 +63,21 @@
 			</div>
 		</div>
 	</section>
+	<section id="about" class="layers">
+		<div class="layers__container">
+			<div class="layers__item layer-1" style="background-image: url(static/back4.jpg);"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<h1>Разработали <span></span></h1>
+					<div class="hero-content__p">Кириллов Владимир, Чудин Дмитрий, Анфилатова Надежда</div>
+                    <div class="hero-content__p">Воронина Елизавета, Эскина Виктория, Синицина Софья</div>
+                    <div class="hero-content__p">Конахин Даниил, Бутров Михаил</div>
+                    <div class="hero-content__p">И руководитель проетка - Маршалов Евгений</div>
+                </div>
+			</div>
+		</div>
+	</section>
+
     {% else %}
 
     {% endif %}

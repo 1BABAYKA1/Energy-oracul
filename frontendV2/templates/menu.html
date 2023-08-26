@@ -16,24 +16,12 @@
 		</div>
 	</section>
 	<section id="menu" class="layers">
-		<div class="layers__container_not_preserve">
+		<div class="layers__container_not_preserve" style="background-image: url(static/back3.jpg);">
 
 			<div class="layers__item layer-1"></div>
 			<div class="layers__item layer-3">
 				<div class="hero-content">
 					<section id="header-container">
-						<div class="dropdown">
-							<label for="layer-select">Тип геолокации</label>
-							<select id="layer-select">
-								<option value="sam">Написать самому</option>
-								<option value="nesam">Текущая геопозиция</option>
-							</select>
-						</div>
-						<div id="input-container" style="display: none;">
-							<label for="custom-location">Введите геолокацию:</label>
-							<input type="text" id="custom-location" />
-						</div>
-					
 						<div class="dropdown">
 							<label for="layer-select-2">Время прогноза</label>
 							<select id="layer-select-2">
@@ -63,46 +51,38 @@
 	const button = document.getElementById('predict-button');
 	const uploadLabel = document.getElementById('upload-button');
 	const fileInput = document.getElementById('file-input');
-	const layerInput = document.getElementById('layer-select');
 	const layer2Input = document.getElementById('layer-select-2');
-	
+
 	let selectedFile;
 	let formData;
-	let tokenKey; // Специальный токен-ключ
+	let tokenKey;
 	let latitude;
 	let longitude;
+
 	fileInput.addEventListener('change', function() {
 		selectedFile = this.files[0];
 		if (selectedFile) {
 			formData = new FormData();
-			
-			// Генерируем токен-ключ
-			tokenKey = generateTokenKey(); // Ваша функция для генерации токен-ключа
-			
-			// Переименовываем файл и добавляем его в FormData
+			tokenKey = generateTokenKey();
 			const renamedFile = new File([selectedFile], tokenKey + '.' + selectedFile.name.split('.').pop());
 			formData.append('file', renamedFile);
-	
 			uploadLabel.classList.add('uploaded');
 			uploadLabel.textContent = 'Файл загружен';
-	
-			uploadLabel.removeEventListener('click', openFileInput);
 		}
 	});
-	
+
+	navigator.geolocation.getCurrentPosition(function(position) {
+		latitude = position.coords.latitude;
+		longitude = position.coords.longitude;
+	});
 	button.addEventListener('click', function() {
 		if (selectedFile && tokenKey) {
 			const params = new URLSearchParams();
-			params.append('val', layerInput.value);
-			params.append('val', layer2Input.value);
-			if ("geolocation" in navigator) {
-				params.append('val1', latitude);
-				params.append('val2', longitude);
-			}
-	
-			// Добавляем токен-ключ к параметрам
+			params.append('hours', layer2Input.value);
+			params.append('latitude', latitude)
+			params.append('longitude', longitude)
 			params.append('tokenKey', tokenKey);
-	
+			button.textContent = 'Отправка запроса';
 			fetch('/upload?' + params.toString(), {
 				method: 'POST',
 				body: formData
@@ -110,9 +90,29 @@
 			.then(response => response.text())
 			.then(data => {
 				console.log('Ответ сервера:', data);
+				const jsonData = JSON.parse(data);
+					
+					if (jsonData.status_code === "format_error") {
+						button.textContent = 'Ошибка формата файла';
+					}
+					if (jsonData.status_code === "error") {
+						button.textContent = 'Сторонняя ошибка сервера';
+					}  
+					if (jsonData.status_code === "good") {
+						button.textContent = 'Ожидайте загрузку файла';
+						const downloadLink = document.createElement('a');
+						downloadLink.href = '/download/' + jsonData.url;
+						downloadLink.download = jsonData.url;
+						downloadLink.style.display = 'none';
+						document.body.appendChild(downloadLink);
+						downloadLink.click();
+						document.body.removeChild(downloadLink);
+					}
+					
 			})
 			.catch(error => {
 				console.error('Ошибка загрузки файла:', error);
+				button.textContent = 'Ошибка при обработке запроса';
 			});
 		}
 	});
@@ -123,16 +123,6 @@
 	
 	uploadLabel.addEventListener('click', openFileInput);
 	
-	if ("geolocation" in navigator) {
-		layerInput.addEventListener('change', function() {
-			if (this.value === 'nesam') {
-				navigator.geolocation.getCurrentPosition(function(position) {
-					latitude = position.coords.latitude;
-					longitude = position.coords.longitude;
-				});
-			}
-		});
-	}
 
 function generateTokenKey(length = 20) {
     const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
