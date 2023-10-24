@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<section id="home" class="layers">
+		<div class="layers__container">
+			<div class="layers__item layer-1" style="background-image: url(static/back.jpg);"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<h1>Energy Oracle <span>Россети</span></h1>
+					<div class="hero-content__p">Forecast of electric energy consumption</div>
+				</div>
+			</div>
+			<div class="layers__item layer-4">
+				<canvas class="rain"></canvas>
+			</div>
+		</div>
+	</section>
+	<section id="menu" class="layers">
+		<div class="layers__container_not_preserve">
+			<div class="layers__item layer-1"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<button class="button-start" ><a class='text' href="#use">Попробовать предсказание</button>
+				</div>
+			</div>
+			<div class="layers__item layer-4">
+				<canvas class="rain"></canvas>
+			</div>
+		</div>
+	</section>
+	<section id="about" class="contact-section">
+        <section id="about" class="layers">
+            <div class="layers__container">
+                <div class="layers__item layer-1">О нашем проекте</div>
+                <div class="layers__item layer-3">
+                </div>
+	</section>
+	<section id="contact" class="contact-section">
+	</section>
+{% endblock %}

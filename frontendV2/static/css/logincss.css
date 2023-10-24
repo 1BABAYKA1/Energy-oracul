@@ -1,0 +1,39 @@
+.btn {
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}
+
+/* Стилизация ссылок */
+a {
+    color: #007bff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #0056b3;
+}
+
+.alert {
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.alert-danger {
+    background-color: #77000a;
+    border-color: #f5c6cb;
+    color: #ffffff;
+}

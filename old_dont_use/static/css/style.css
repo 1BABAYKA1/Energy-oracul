@@ -1,0 +1,94 @@
+body {
+    background: #000 url(fonC.jpg);
+    background-attachment: fixed;
+    background-repeat: repeat-x;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, p, li {
+    color: #fff;
+}
+
+.registration-form {
+    max-width: 500px;
+    min-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.form-group {
+    margin-bottom: 10px;
+    color: #fff;
+}
+
+
+.form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.btn-primary {
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #2980b9;
+}
+
+.navbar {
+    padding: 10px 0;
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+}
+
+.navbar a.navbar-brand:hover {
+    color: #ffc107; /* Измените цвет при наведении */
+}
+
+/* Добавьте стили для кнопок в навигационном баре */
+.navbar a.btn {
+    margin-right: 10px;
+}
+
+/* Стили для изменения цвета кнопок при наведении */
+.navbar a.btn:hover {
+    background-color: #ffc107;
+    color: #333;
+}
+
+/* Дополнительные стили для кнопок */
+.btn-light {
+    background-color: #f8f9fa;
+    color: #333;
+    border-color: #f8f9fa;
+}
+
+/* Стиль для кнопок при наведении */
+.btn-light:hover {
+    background-color: #e2e6ea;
+    color: #333;
+    border-color: #e2e6ea;
+}

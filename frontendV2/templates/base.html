@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/rain.js" defer></script>
+    <title>{{ title }}</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Главная</a></li>
+                <li><a href="#about">О проекте</a></li>
+                <li><a href="#contact">Контакты</a></li>
+                {% if user %}
+                    <li class="user-nickname">
+                        {{ user }}
+                        <ul class="user-menu">
+                            <li><a href="/logout">Выйти</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li><a href="/login">Вход</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>  
+<script>
+        const userNickname = document.querySelector('.user-nickname');
+        const userMenu = document.querySelector('.user-menu');
+    
+        if (userNickname) {
+            userNickname.addEventListener('mouseover', () => {
+                userMenu.style.display = 'block';
+            });
+        }
+        if (userNickname) {
+            userNickname.addEventListener('mouseout', () => {
+                userMenu.style.display = 'none';
+            });
+        }
+
+		
+    </script>
+
+    <main role="main" class="container">
+        {% block content %}{% endblock %}
+    </main>
+	
+    {% if request.path not in ['/login', '/register'] %}
+	<script src="/static/app.js" defer></script>
+    <section id="contact" class="layers">
+		<div class="layers__container">
+			<div class="layers__item layer-1" style="background-image: url(static/back2.jpg);"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<h1>Контакты <span></span></h1>
+					<div class="hero-content__p">Победители олимпиады Россети</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section id="about" class="layers">
+		<div class="layers__container">
+			<div class="layers__item layer-1" style="background-image: url(static/back4.jpg);"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<h1>Разработали <span></span></h1>
+					<div class="hero-content__p">Кириллов Владимир, Чудин Дмитрий, Анфилатова Надежда</div>
+                    <div class="hero-content__p">Воронина Елизавета, Эскина Виктория, Синицина Софья</div>
+                    <div class="hero-content__p">Конахин Даниил, Бутров Михаил</div>
+                    <div class="hero-content__p">И руководитель проетка - Маршалов Евгений</div>
+                </div>
+			</div>
+		</div>
+	</section>
+
+    {% else %}
+
+    {% endif %}
+    
+</body>
+</html>

@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+	<section id="home" class="layers">
+		<div class="layers__container">
+			<div class="layers__item layer-1" style="background-image: url(static/back.jpg);"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<h1>Energy Oracle <span>Россети</span></h1>
+					<div class="hero-content__p">Forecast of electric energy consumption</div>
+				</div>
+			</div>
+			<div class="layers__item layer-4">
+				<canvas class="rain"></canvas>
+			</div>
+		</div>
+	</section>
+	<section id="menu" class="layers">
+		<div class="layers__container_not_preserve" style="background-image: url(static/back3.jpg);">
+
+			<div class="layers__item layer-1"></div>
+			<div class="layers__item layer-3">
+				<div class="hero-content">
+					<section id="header-container">
+						<div class="dropdown">
+							<label for="layer-select-2">Время прогноза</label>
+							<select id="layer-select-2">
+								<option value="1">1 час</option>
+								<option value="6">6 часов</option>
+								<option value="24">1 сутки</option>
+								<option value="72">3 суток</option>
+								<option value="168">1 неделя</option>
+
+							</select>
+						</div>
+						<div class="file-upload">
+							<input type="file" id="file-input" accept=".excel, .csv" style="display: none;" />
+							<button id="upload-button">Загрузить файл</button>
+						</div>
+					<button class="button-start" id='predict-button'>
+						<a class="text">Попробовать предсказание</a>
+					</button>
+				</div>
+			</div>
+			<div class="layers__item layer-4">
+				<canvas class="rain"></canvas>
+			</div>
+		</div>
+	</section>
+<script>
+	const button = document.getElementById('predict-button');
+	const uploadLabel = document.getElementById('upload-button');
+	const fileInput = document.getElementById('file-input');
+	const layer2Input = document.getElementById('layer-select-2');
+
+	let selectedFile;
+	let formData;
+	let tokenKey;
+	let latitude;
+	let longitude;
+
+	fileInput.addEventListener('change', function() {
+		selectedFile = this.files[0];
+		if (selectedFile) {
+			formData = new FormData();
+			tokenKey = generateTokenKey();
+			const renamedFile = new File([selectedFile], tokenKey + '.' + selectedFile.name.split('.').pop());
+			formData.append('file', renamedFile);
+			uploadLabel.classList.add('uploaded');
+			uploadLabel.textContent = 'Файл загружен';
+		}
+	});
+
+	navigator.geolocation.getCurrentPosition(function(position) {
+		latitude = position.coords.latitude;
+		longitude = position.coords.longitude;
+	});
+	button.addEventListener('click', function() {
+		if (selectedFile && tokenKey) {
+			const params = new URLSearchParams();
+			params.append('hours', layer2Input.value);
+			params.append('latitude', latitude)
+			params.append('longitude', longitude)
+			params.append('tokenKey', tokenKey);
+			button.textContent = 'Отправка запроса';
+			fetch('/upload?' + params.toString(), {
+				method: 'POST',
+				body: formData
+			})
+			.then(response => response.text())
+			.then(data => {
+				console.log('Ответ сервера:', data);
+				const jsonData = JSON.parse(data);
+					
+					if (jsonData.status_code === "format_error") {
+						button.textContent = 'Ошибка формата файла';
+					}
+					if (jsonData.status_code === "error") {
+						button.textContent = 'Сторонняя ошибка сервера';
+					}  
+					if (jsonData.status_code === "good") {
+						button.textContent = 'Ожидайте загрузку файла';
+						const downloadLink = document.createElement('a');
+						downloadLink.href = '/download/' + jsonData.url;
+						downloadLink.download = jsonData.url;
+						downloadLink.style.display = 'none';
+						document.body.appendChild(downloadLink);
+						downloadLink.click();
+						document.body.removeChild(downloadLink);
+					}
+					
+			})
+			.catch(error => {
+				console.error('Ошибка загрузки файла:', error);
+				button.textContent = 'Ошибка при обработке запроса';
+			});
+		}
+	});
+	
+	function openFileInput() {
+		fileInput.click();
+	}
+	
+	uploadLabel.addEventListener('click', openFileInput);
+	
+
+function generateTokenKey(length = 20) {
+    const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let token = '';
+    for (let i = 0; i < length; i++) {
+        const randomIndex = Math.floor(Math.random() * characters.length);
+        token += characters[randomIndex];
+    }
+    return token;
+}
+
+
+</script>
+{% endblock %}

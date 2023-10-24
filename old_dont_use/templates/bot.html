@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Прогнозы</h1>
+    
+    <div class="form-group">
+        <label for="select-country">Выберите тип геолокации</label>
+        <select class="form-control" id="select-country" onchange="toggleCityInput()">
+            <option value="sam">Ввести город</option>
+            <option value="nesam">Определить автоматически</option>
+        </select>
+    </div>
+    
+    <div class="form-group" id="city-input" style="display: none;">
+        <label for="input-city">Введите название города:</label>
+        <input type="text" class="form-control" id="input-city">
+    </div>
+    
+    <div class="form-group">
+        <label for="select-time">Время прогноза на</label>
+        <select class="form-control" id="select-time">
+            <option value="1">1 час</option>
+            <option value="3">3 часа</option>
+            <option value="6">6 часов</option>
+            <option value="24">1 день</option>
+            <option value="72">3 дня</option>
+            <option value="240">10 дней</option>
+        </select>
+    </div>
+    
+    <p>Ваша текущая геолокация: <span id="current-location"></span></p>
+    
+    <script>
+        function toggleCityInput() {
+            var selectCountry = document.getElementById("select-country");
+            var cityInput = document.getElementById("city-input");
+            
+            if (selectCountry.value === "sam") {
+                cityInput.style.display = "block";
+            } else {
+                cityInput.style.display = "none";
+            }
+        }
+        
+        // Получение текущей геолокации браузера
+        function getCurrentLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    document.getElementById("current-location").innerHTML = `Широта: ${latitude}, Долгота: ${longitude}`;
+                });
+            } else {
+                document.getElementById("current-location").innerHTML = "Геолокация недоступна";
+            }
+        }
+        
+        // Вызов функции при загрузке страницы
+        window.onload = function() {
+            getCurrentLocation();
+        };
+    </script>
+    
+{% endblock %}
