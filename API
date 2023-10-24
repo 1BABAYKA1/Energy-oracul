@@ -1,0 +1,57 @@
+import requests
+
+
+sp = []
+def get_weather_forecast(i):
+    global sp
+    url = "http://api.weatherapi.com/v1/forecast.json"
+    params = {
+        "key": "4a29ee892ea14dd3869142054231308",
+        "q": "Moscow",
+        "days": "10",
+        "hour": i
+    }
+
+    response = requests.get(url, params=params)
+    data = response.json()
+
+    forecast = data['forecast']['forecastday']
+
+    for day in forecast:
+        date = day['date']
+        hour = day['hour']
+        temperature = day['hour']
+        condition = day['day']['condition']['text']
+        # print(f"День: {date}, Hour: {hour} Температура: {temperature}°C, Условия: {condition}")
+        sp.append([date, hour[0]['time'], temperature[0]['temp_c'], condition])
+
+
+# Введите ваш API-ключ WeatherAPI
+api_key = "4a29ee892ea14dd3869142054231308"
+for i in range(0,24):
+    get_weather_forecast(i)
+for j in range(10):
+    print(sp[j])
+    print(sp[j+10])
+    print(sp[j + 20])
+    print(sp[j +30])
+    print(sp[j +40])
+    print(sp[j +50])
+    print(sp[j +60])
+    print(sp[j +70])
+    print(sp[j +80])
+    print(sp[j +90])
+    print(sp[j +100])
+    print(sp[j +110])
+    print(sp[j +120])
+    print(sp[j +130])
+    print(sp[j +140])
+    print(sp[j +150])
+    print(sp[j+ 160])
+    print(sp[j +170])
+    print(sp[j +180])
+    print(sp[j +190])
+    print(sp[j +200])
+    print(sp[j +210])
+    print(sp[j +220])
+    print(sp[j +230])
